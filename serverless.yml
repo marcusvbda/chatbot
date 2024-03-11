@@ -22,14 +22,7 @@ provider:
         # DB_USERNAME: "postgres.vhfwbdkfrjrjeroilcgw"
         # DB_PASSWORD: "@99fqxU5J*vpzc9&"
         FILESYSTEM_DISK: s3_storage
-        PUSHER_APP_ID: 1754804
-        PUSHER_APP_KE: c71c636e720a2b9b30d7
-        PUSHER_APP_SECRET: e6c8a66c514a61f69683
         PUSHER_APP_CLUSTER: us2
-        MIX_PUSHER_APP_ID: "${PUSHER_APP_ID}"
-        MIX_PUSHER_APP_KEY: "${PUSHER_APP_KEY}"
-        MIX_PUSHER_APP_SECRET: "${PUSHER_APP_SECRET}"
-        MIX_PUSHER_APP_CLUSTER: "${PUSHER_APP_CLUSTER}"
         BREF_BINARY_RESPONSES: 1
     apiGateway:
         binaryMediaTypes:
