@@ -1,0 +1,82 @@
+service: chatbot-serverless
+
+provider:
+    name: aws
+    # The AWS region in which to deploy (us-east-1 is the default)
+    region: us-east-1
+    # Environment variables
+    environment:
+        APP_DEBUG: ${sls:stage} !== 'production'
+        APP_ENV: 'production'
+        LOG_CHANNEL: stderr
+        SESSION_DRIVER: cookie
+        CACHE_DRIVER: array
+        QUEUE_CONNECTION: sync
+        VIEW_COMPILED_PATH: /tmp/storage/framework/views
+        FILESYSTEM_DRIVER: s3_storage
+        APP_STORAGE: '/tmp/storage'
+        # DB_CONNECTION: pgsql
+        # DB_HOST: "aws-0-us-east-1.pooler.supabase.com"
+        # DB_PORT: 6543
+        # DB_DATABASE: postgres
+        # DB_USERNAME: "postgres.vhfwbdkfrjrjeroilcgw"
+        # DB_PASSWORD: "@99fqxU5J*vpzc9&"
+        FILESYSTEM_DISK: s3_storage
+        PUSHER_APP_ID: 1754804
+        PUSHER_APP_KE: c71c636e720a2b9b30d7
+        PUSHER_APP_SECRET: e6c8a66c514a61f69683
+        PUSHER_APP_CLUSTER: us2
+        MIX_PUSHER_APP_ID: "${PUSHER_APP_ID}"
+        MIX_PUSHER_APP_KEY: "${PUSHER_APP_KEY}"
+        MIX_PUSHER_APP_SECRET: "${PUSHER_APP_SECRET}"
+        MIX_PUSHER_APP_CLUSTER: "${PUSHER_APP_CLUSTER}"
+        BREF_BINARY_RESPONSES: 1
+    apiGateway:
+        binaryMediaTypes:
+            - '*/*'
+
+package:
+    # Files and directories to exclude from deployment
+    patterns:
+        - '!node_modules/**'
+        - '!public/storage'
+        - '!resources/assets/**'
+        - '!storage/**'
+        - '!tests/**'
+        - '!.docker/**'
+        - '!.git/**'
+        - '!.vscode/**'
+
+functions:
+
+    # This function runs the Laravel website/API
+    web:
+        handler: public/index.php
+        runtime: php-81-fpm
+        timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
+        events:
+            - httpApi: '*'
+
+    # This function lets us run artisan commands in Lambda
+    artisan:
+        handler: artisan
+        runtime: php-81-console
+        timeout: 720 # in seconds
+        # Uncomment to also run the scheduler every minute
+        #events:
+        #    - schedule:
+        #          rate: rate(1 minute)
+        #          input: '"schedule:run"'
+
+plugins:
+    # We need to include the Bref plugin
+    - ./vendor/bref/bref
+    - serverless-lift
+
+constructs:
+    website:
+        type: server-side-website
+        assets:
+            '/build/*': public/build
+            '/images/*': public/images
+            '/robots.txt': public/robots.txt
