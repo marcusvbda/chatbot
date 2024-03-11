@@ -15,7 +15,7 @@ class AccessGroups extends Module
 {
     public function subMenu(): string
     {
-        return "Configurações";
+        return "Acessos";
     }
 
     public function name(): array

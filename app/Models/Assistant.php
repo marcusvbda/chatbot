@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class Assistant extends Model
 {
-    protected $table = "customers";
+    protected $table = "assistants";
     public $guarded = ["created_at"];
 }

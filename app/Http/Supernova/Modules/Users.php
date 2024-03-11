@@ -2,10 +2,7 @@
 
 namespace App\Http\Supernova\Modules;
 
-use App\Livewire\Users\UserSignature;
 use App\Models\AccessGroup;
-use App\Models\Squad;
-use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use marcusvbda\supernova\Column;
@@ -20,7 +17,7 @@ class Users extends Module
 {
     public function subMenu(): string
     {
-        return "Time";
+        return "Acessos";
     }
 
     public function name(): array

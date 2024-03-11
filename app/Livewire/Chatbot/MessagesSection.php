@@ -16,12 +16,11 @@ class MessagesSection extends Component
     public function mount()
     {
         $this->threadId = $this->getThreadId();
-        $this->assistantId = "asst_z8xZnRX0ytGtzV8SAEW06ds3";
     }
 
     private function getThreadId()
     {
-        $thread = (new OpenIaController())->createThread();
+        $thread = (new OpenIaController)->createThread();
         return data_get($thread, "id");
     }
 
@@ -32,8 +31,7 @@ class MessagesSection extends Component
             'role' => 'user',
             'content' => $message
         ];
-        $controller = new OpenIaController();
-        $controller->addMessageToThread($this->threadId, $message);
+        (new OpenIaController)->addMessageToThread($this->threadId, $message);
         $this->dispatch("start-typing");
     }
 
@@ -48,7 +46,7 @@ class MessagesSection extends Component
     #[On('process-answerd')]
     public function processAnswer()
     {
-        $controller = new OpenIaController();
+        $controller = new OpenIaController;
         $run = $controller->runThreadOnAssistant($this->threadId, $this->assistantId);
         $runIsCompleted = false;
         $runResponse = [];

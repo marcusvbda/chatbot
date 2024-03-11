@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assistant;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
@@ -9,9 +10,10 @@ class OpenIaController extends Controller
 {
     private $model = "gpt-3.5-turbo";
 
-    public function index()
+    public function testBot($id)
     {
-        return view('openia.index');
+        $assistant = Assistant::findOrFail($id);
+        return view('chatbot.test', compact('assistant'));
     }
 
     public function makeClient($model = "gpt-3.5-turbo"): PendingRequest
@@ -40,7 +42,10 @@ class OpenIaController extends Controller
         $client = $this->makeClient();
         $result = $client->post('/v1/assistants', [
             'model' => $this->model,
-            'instruction' => $instruction,
+            'instructions' => $instruction,
+            "tools" => [
+                ["type" => "code_interpreter"]
+            ],
             'name' => $name,
         ]);
         return $result->json();
