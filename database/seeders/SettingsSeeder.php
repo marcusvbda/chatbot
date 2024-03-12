@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\AssistantSetting;
+use App\Models\Setting;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class AssistantSettingsSeeder extends Seeder
+class SettingsSeeder extends Seeder
 {
     public function run()
     {
@@ -17,7 +17,7 @@ class AssistantSettingsSeeder extends Seeder
 
     protected function createSettings()
     {
-        AssistantSetting::create(["key" => "openia_base_url", "value" => "https://api.openai.com"]);
-        AssistantSetting::create(["key" => "openia_api_key", "value" => env("OPENIA_API_KEY")]);
+        Setting::create(["key" => "openia_base_url", "value" => "https://api.openai.com"]);
+        Setting::create(["key" => "openia_api_key", "value" => env("OPENIA_API_KEY")]);
     }
 }

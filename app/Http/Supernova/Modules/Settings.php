@@ -2,28 +2,28 @@
 
 namespace App\Http\Supernova\Modules;
 
-use App\Models\AssistantSetting;
+use App\Models\Setting;
 use marcusvbda\supernova\Column;
 use marcusvbda\supernova\Field;
 use marcusvbda\supernova\FIELD_TYPES;
 use marcusvbda\supernova\FILTER_TYPES;
 use marcusvbda\supernova\Module;
 
-class AssistantSettings extends Module
+class Settings extends Module
 {
     public function name(): array
     {
-        return ['Configuração', 'Configurações'];
+        return ['Parâmetro', 'Configurações'];
     }
 
-    public function subMenu(): string
+    public function menu(): ?string
     {
-        return "Chatbot";
+        return null;
     }
 
     public function model(): string
     {
-        return AssistantSetting::class;
+        return Setting::class;
     }
 
     public function dataTable(): array
@@ -34,11 +34,11 @@ class AssistantSettings extends Module
         $columns[] = Column::make("key", "Chave")
             ->searchable()->sortable()
             ->callback(function ($row) {
-                $keys = AssistantSetting::$KEYS;
+                $keys = Setting::$KEYS;
                 return data_get(collect($keys)->where("value", $row->key)->first(), "label");
             })
             ->filterable(FILTER_TYPES::SELECT)
-            ->filterOptions(AssistantSetting::$KEYS);
+            ->filterOptions(Setting::$KEYS);
         $columns[] = Column::make("value", "Valor")
             ->searchable()->sortable()
             ->filterable(FILTER_TYPES::TEXT);
@@ -49,7 +49,7 @@ class AssistantSettings extends Module
     {
         return [
             Field::make("key", "Chave")->rules(["required", "unique:assistant_settings,key," . @$row->id])
-                ->type(FIELD_TYPES::SELECT)->options(AssistantSetting::$KEYS),
+                ->type(FIELD_TYPES::SELECT)->options(Setting::$KEYS),
             Field::make("value", "Valor")->rules(["required"]),
         ];
     }

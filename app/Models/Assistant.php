@@ -13,9 +13,4 @@ class Assistant extends Model
     {
         return $this->hasMany(TrainRow::class, "assistant_id");
     }
-
-    public function assistantSettings()
-    {
-        return $this->hasMany(AssistantSetting::class, "assistant_id");
-    }
 }

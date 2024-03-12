@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AssistantSetting extends Model
+class Setting extends Model
 {
-    protected $table = "assistant_settings";
+    protected $table = "settings";
     public $guarded = ["created_at"];
 
     public static $KEYS = [

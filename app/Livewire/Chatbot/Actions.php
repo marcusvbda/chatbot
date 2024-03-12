@@ -4,7 +4,7 @@ namespace App\Livewire\Chatbot;
 
 use App\Http\Controllers\OpenIaController;
 use App\Http\Supernova\Application;
-use App\Models\AssistantSetting;
+use App\Models\Setting;
 use Livewire\Component;
 
 class Actions extends Component
@@ -23,7 +23,7 @@ class Actions extends Component
 
     public function render()
     {
-        $this->canTest = AssistantSetting::where('key', 'openia_api_key')->count() > 0;
+        $this->canTest = Setting::where('key', 'openia_api_key')->count() > 0;
         return view('livewire.chatbot.actions');
     }
 }

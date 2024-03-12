@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Assistant;
-use App\Models\AssistantSetting;
+use App\Models\Setting;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -15,14 +15,14 @@ class OpenIaController extends Controller
     public function testBot($id)
     {
         $assistant = Assistant::findOrFail($id);
-        AssistantSetting::where('key', 'openia_api_key')->firstOrFail();
+        Setting::where('key', 'openia_api_key')->firstOrFail();
         return view('chatbot.test', compact('assistant'));
     }
 
     public function makeClient($model = "gpt-3.5-turbo"): PendingRequest
     {
-        $apiToken = AssistantSetting::where('key', 'openia_api_key')->firstOrFail()->value;
-        $baseUrl = AssistantSetting::where('key', 'openia_base_url')->firstOrFail()->value;
+        $apiToken = Setting::where('key', 'openia_api_key')->firstOrFail()->value;
+        $baseUrl = Setting::where('key', 'openia_base_url')->firstOrFail()->value;
         $this->model = $model;
         return Http::timeout(30)
             ->retry(3, 100)
