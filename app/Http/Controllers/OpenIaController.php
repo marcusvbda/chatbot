@@ -22,11 +22,11 @@ class OpenIaController extends Controller
     public function makeClient($model = "gpt-3.5-turbo"): PendingRequest
     {
         $apiToken = AssistantSetting::where('key', 'openia_api_key')->firstOrFail()->value;
-        $configOpenIa = config("openia");
+        $baseUrl = AssistantSetting::where('key', 'openia_base_url')->firstOrFail()->value;
         $this->model = $model;
         return Http::timeout(30)
             ->retry(3, 100)
-            ->baseUrl(data_get($configOpenIa, "base_url"))
+            ->baseUrl($baseUrl)
             ->withHeaders([
                 'OpenAI-Beta' => 'assistants=v1',
                 'Content-Type' => 'application/json',
