@@ -4,6 +4,7 @@ namespace App\Http\Supernova\Modules;
 
 use App\Http\Controllers\OpenIaController;
 use App\Models\Assistant;
+use Illuminate\Support\Facades\Auth;
 use marcusvbda\supernova\Column;
 use marcusvbda\supernova\Field;
 use marcusvbda\supernova\FIELD_TYPES;
@@ -77,5 +78,20 @@ class Assistants extends Module
         }
         $controller->deleteAssistant($entity->openia_id);
         parent::onDelete($entity);
+    }
+
+    public function canCreate(): bool
+    {
+        return Auth::user()->hasPermission('create-assistants');
+    }
+
+    public function canEdit(): bool
+    {
+        return Auth::user()->hasPermission('edit-assistants');
+    }
+
+    public function canDelete(): bool
+    {
+        return Auth::user()->hasPermission('delete-assistants');
     }
 }

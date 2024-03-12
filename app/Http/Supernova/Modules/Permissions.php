@@ -60,18 +60,15 @@ class Permissions extends Module
         ];
     }
 
-    public function canDelete(): bool
+    public function permissions()
     {
-        return Auth::user()->role === "root";
-    }
-
-    public function canEdit(): bool
-    {
-        return Auth::user()->role === "root";
-    }
-
-    public function canCreate(): bool
-    {
-        return Auth::user()->role === "root";
+        $user = Auth::user();
+        $isRoot = $user->role === 'root';
+        return [
+            "view_details" => $isRoot,
+            "create" => $isRoot,
+            "edit" => $isRoot,
+            "delete" => $isRoot
+        ];
     }
 }

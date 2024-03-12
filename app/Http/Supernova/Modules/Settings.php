@@ -3,6 +3,7 @@
 namespace App\Http\Supernova\Modules;
 
 use App\Models\Setting;
+use Illuminate\Support\Facades\Auth;
 use marcusvbda\supernova\Column;
 use marcusvbda\supernova\Field;
 use marcusvbda\supernova\FIELD_TYPES;
@@ -14,6 +15,19 @@ class Settings extends Module
     public function name(): array
     {
         return ['Parâmetro', 'Configurações'];
+    }
+
+    public function permissions()
+    {
+        $user = Auth::user();
+        $isRoot = $user->role === 'root';
+        return [
+            "view_index" => $isRoot,
+            "view_details" => $isRoot,
+            "create" => $isRoot,
+            "edit" => $isRoot,
+            "delete" => $isRoot
+        ];
     }
 
     public function menu(): ?string

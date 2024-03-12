@@ -115,4 +115,15 @@ class Users extends Module
 
         return $id;
     }
+
+    public function permissions()
+    {
+        $user = Auth::user();
+        $isRoot = $user->role === 'root';
+        return [
+            "create" => $isRoot,
+            "edit" => $isRoot,
+            "delete" => $isRoot
+        ];
+    }
 }

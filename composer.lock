@@ -2675,7 +2675,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcusvbda/supernova.git",
-                "reference": "8b885b4ea40113fd5fccfc9bc758b7d26b1efbd0"
+                "reference": "ebea115f4c869403906a196f24aa9585b74f4242"
             },
             "require": {
                 "livewire/livewire": "^3.4"
@@ -2696,7 +2696,7 @@
                     "email": "bassalobre.vinicius@gmail.com"
                 }
             ],
-            "time": "2024-03-12T12:20:28+00:00"
+            "time": "2024-03-12T18:36:04+00:00"
         },
         {
             "name": "monolog/monolog",
