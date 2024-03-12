@@ -15,6 +15,7 @@ return new class extends Migration
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->string('openia_id')->nullable();
+            $table->string('file_id')->nullable();
             $table->string('name');
             $table->longText('instructions');
             $table->timestamps();
