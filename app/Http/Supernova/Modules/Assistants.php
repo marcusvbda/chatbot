@@ -3,7 +3,6 @@
 namespace App\Http\Supernova\Modules;
 
 use App\Http\Controllers\OpenIaController;
-use App\Livewire\Chatbot\TestBot;
 use App\Models\Assistant;
 use marcusvbda\supernova\Column;
 use marcusvbda\supernova\Field;
@@ -48,12 +47,10 @@ class Assistants extends Module
             Field::make("name", "Nome")->rules(["required"]),
             Field::make("instructions", "Instruções")->type(FIELD_TYPES::TEXTAREA)->rules(["required"]),
             Field::make("openia_id", "Id na OpenIA")->disabled()->canSee(in_array($page, ["details", "edit"])),
-            Field::make("signture", "Chatbot")->component(function ($entity) {
-                $id = data_get($entity, "id");
-                return <<<BLADE
-                    <a href="/assistants/$id/test-bot" class="text-sm text-blue-500 hover:underline">Testar assistente</a>
-                BLADE;
+            Field::make("actions", "Ações")->component(function ($entity) {
+                return view("chatbot.actions", compact("entity"));
             })->canSee(in_array($page, ["details", "edit"])),
+            Field::make(TrainRows::class)
         ];
     }
 

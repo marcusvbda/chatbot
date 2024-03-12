@@ -1,5 +1,6 @@
 <?php
 
+use Database\Seeders\AssistantSettingsSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,6 +10,16 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::create("assistant_settings", function (Blueprint $table) {
+            $table->charset = 'utf8mb4';
+            $table->collation = 'utf8mb4_unicode_ci';
+            $table->engine = 'InnoDB';
+            $table->bigIncrements('id');
+            $table->string('key')->unique();
+            $table->string('value');
+            $table->timestamps();
+        });
+
         Schema::create("assistants", function (Blueprint $table) {
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
@@ -19,8 +30,21 @@ return new class extends Migration
             $table->longText('instructions');
             $table->timestamps();
         });
+
+        Schema::create("train_rows", function (Blueprint $table) {
+            $table->charset = 'utf8mb4';
+            $table->collation = 'utf8mb4_unicode_ci';
+            $table->engine = 'InnoDB';
+            $table->bigIncrements('id');
+            $table->longText('user');
+            $table->longText('assistant');
+            $table->unsignedBigInteger('assistant_id');
+            $table->foreign('assistant_id')->references('id')->on('assistants')->onDelete('cascade');
+            $table->timestamps();
+        });
         $aclSeeder = new PermissionSeeder();
         $aclSeeder->makePermissions('Assistentes', 'assistants');
+        (new AssistantSettingsSeeder())->run();
     }
 
     public function down(): void

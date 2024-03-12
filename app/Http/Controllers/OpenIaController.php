@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Assistant;
+use App\Models\AssistantSetting;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -14,11 +15,13 @@ class OpenIaController extends Controller
     public function testBot($id)
     {
         $assistant = Assistant::findOrFail($id);
+        AssistantSetting::where('key', 'openia_api_key')->firstOrFail();
         return view('chatbot.test', compact('assistant'));
     }
 
     public function makeClient($model = "gpt-3.5-turbo"): PendingRequest
     {
+        $apiToken = AssistantSetting::where('key', 'openia_api_key')->firstOrFail()->value;
         $configOpenIa = config("openia");
         $this->model = $model;
         return Http::timeout(30)
@@ -27,7 +30,7 @@ class OpenIaController extends Controller
             ->withHeaders([
                 'OpenAI-Beta' => 'assistants=v1',
                 'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . data_get($configOpenIa, "api_key"),
+                'Authorization' => 'Bearer ' . $apiToken
             ]);
     }
 
@@ -36,6 +39,12 @@ class OpenIaController extends Controller
         $client = $this->makeClient();
         $result = $client->post('/v1/threads');
         return $result->json();
+    }
+
+    public function trainAssistant($id)
+    {
+        $assistant = Assistant::findOrFail($id);
+        dd("treinar", $assistant->trainRows);
     }
 
     public function findAssistant($id)
@@ -57,6 +66,20 @@ class OpenIaController extends Controller
 
         $assistant = $this->createAssistant($request->name, $request->instruction);
         return response()->json($assistant);
+    }
+
+    public function createAssistant($name, $instruction): array
+    {
+        $client = $this->makeClient();
+        $result = $client->post('/v1/assistants', [
+            'model' => $this->model,
+            'instructions' => $instruction,
+            "tools" => [
+                ["type" => "code_interpreter"]
+            ],
+            'name' => $name,
+        ]);
+        return $result->json();
     }
 
     public function apiAddMessageToThread($id, Request $request): array
