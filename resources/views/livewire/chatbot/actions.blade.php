@@ -9,6 +9,7 @@
     @endif
     @if ($canTrain)
         <button type="button" wire:click="trainAssistant" wire:confirm="Tem certeza que deseja treinar o assistente?"
+            wire:loading.attr="disabled"
             class="border border-blue-500 hover:bg-blue-700 text-blue-500 font-bold hover:text-white py-2 px-6 rounded transition dark:bg-gray-800 hover:dark:bg-gray-900">
             treinar assistente
         </button>

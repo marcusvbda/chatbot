@@ -71,7 +71,11 @@ class Assistants extends Module
 
     public function onDelete($entity): void
     {
-        (new OpenIaController)->deleteAssistant($entity->openia_id);
+        $controller = new OpenIaController;
+        if ($entity->file_id) {
+            $controller->removeAssistantFile($entity);
+        }
+        $controller->deleteAssistant($entity->openia_id);
         parent::onDelete($entity);
     }
 }

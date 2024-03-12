@@ -26,8 +26,8 @@ return new class extends Migration
             $table->collation = 'utf8mb4_unicode_ci';
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
-            $table->longText('user');
-            $table->longText('assistant');
+            $table->longText('prompt');
+            $table->longText('completion');
             $table->unsignedBigInteger('assistant_id');
             $table->foreign('assistant_id')->references('id')->on('assistants')->onDelete('cascade');
             $table->timestamps();

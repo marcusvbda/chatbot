@@ -35,10 +35,10 @@ class TrainRows extends Module
         $columns[] = Column::make("id", "Id")->width("200px")
             ->searchable()->sortable()
             ->filterable(FILTER_TYPES::NUMBER_RANGE);
-        $columns[] = Column::make("user", "Usuário")
+        $columns[] = Column::make("prompt", "Prompt")
             ->searchable()->sortable()
             ->filterable(FILTER_TYPES::TEXT);
-        $columns[] = Column::make("assistant", "Assistente")
+        $columns[] = Column::make("completion", "Completion")
             ->searchable()->sortable()
             ->filterable(FILTER_TYPES::TEXT);
         return $columns;
@@ -47,8 +47,8 @@ class TrainRows extends Module
     public function fields($row, $page): array
     {
         return [
-            Field::make("user", "Usuário")->rules(["required"]),
-            Field::make("assistant", "Assistente")->rules(["required"]),
+            Field::make("prompt", "Prompt")->rules(["required"]),
+            Field::make("completion", "Completion")->rules(["required"]),
         ];
     }
 }

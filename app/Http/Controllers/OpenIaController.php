@@ -47,8 +47,8 @@ class OpenIaController extends Controller
         $content = '';
         foreach ($assistant->trainRows as $row) {
             $content .= json_encode([
-                "prompt" => data_get($row, "user"),
-                "completion" => data_get($row, "assistant")
+                "prompt" => data_get($row, "prompt"),
+                "completion" => data_get($row, "completion")
             ]) . "\n";
         }
         return $content;
@@ -72,7 +72,7 @@ class OpenIaController extends Controller
         return data_get(json_decode($res->getBody()->getContents()), 'id');
     }
 
-    private function removeAssistantFile(Assistant $assistant): void
+    public function removeAssistantFile(Assistant $assistant): void
     {
         $client = $this->makeClient();
         $client->delete('/v1/assistants/' . $assistant->openia_id . '/files/' . $assistant->file_id);
@@ -100,7 +100,6 @@ class OpenIaController extends Controller
     {
         $assistant = Assistant::findOrFail($id);
         $this->createUploadAndLinkFile($assistant);
-        // dd("treinar", $assistant->trainRows);
     }
 
     public function findAssistant($id)
