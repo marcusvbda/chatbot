@@ -8,6 +8,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::prefix('assistants')->group(function () {
             Route::get('', [OpenIaController::class, 'getAssistants']);
             Route::get('{id}', [OpenIaController::class, 'findAssistant']);
+            Route::delete('{id}', [OpenIaController::class, 'deleteAssistant']);
         });
         Route::prefix('threads')->group(function () {
             Route::post('', [OpenIaController::class, 'createThread']);

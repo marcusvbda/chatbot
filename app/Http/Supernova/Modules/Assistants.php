@@ -68,4 +68,10 @@ class Assistants extends Module
         }
         return $parentResult;
     }
+
+    public function onDelete($entity): void
+    {
+        (new OpenIaController)->deleteAssistant($entity->openia_id);
+        parent::onDelete($entity);
+    }
 }

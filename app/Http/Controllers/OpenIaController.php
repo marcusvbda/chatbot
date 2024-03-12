@@ -68,6 +68,13 @@ class OpenIaController extends Controller
         return response()->json($assistant);
     }
 
+    public function deleteAssistant($id): array
+    {
+        $client = $this->makeClient();
+        $result = $client->delete('/v1/assistants/' . $id);
+        return $result->json();
+    }
+
     public function createAssistant($name, $instruction): array
     {
         $client = $this->makeClient();
