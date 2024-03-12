@@ -4,11 +4,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OpenIaController;
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::prefix('openia')->group(function () {
-        Route::post('/threads', [OpenIaController::class, 'createThread']);
-        Route::post('/assistants', [OpenIaController::class, 'createAssistant']);
-        Route::post('/threads/{thread_id}/messages', [OpenIaController::class, 'addMessageToThread']);
-        Route::get('/threads/{thread_id}/messages', [OpenIaController::class, 'addMessageToThread']);
-        Route::post('/threads/{thread_id}/assistants/{assistant_id}/run', [OpenIaController::class, 'runThreadOnAssistant']);
+    Route::prefix('chatbot')->group(function () {
+        Route::prefix('assistants')->group(function () {
+            Route::get('', [OpenIaController::class, 'getAssistants']);
+            Route::get('{id}', [OpenIaController::class, 'findAssistant']);
+        });
+        Route::prefix('threads')->group(function () {
+            Route::post('', [OpenIaController::class, 'createThread']);
+            Route::post('{id}/message', [OpenIaController::class, 'addMessageToThread']);
+            Route::get('{id}/messages', [OpenIaController::class, 'getThreadMessages']);
+            Route::get('{id}/run-status/{runId}', [OpenIaController::class, 'runThreadOnAssistant']);
+            Route::post('{id}/{assistantId}/run', [OpenIaController::class, 'runThreadOnAssistant']);
+        });
     });
 });

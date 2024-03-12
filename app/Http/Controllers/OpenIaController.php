@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Assistant;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class OpenIaController extends Controller
@@ -37,18 +38,31 @@ class OpenIaController extends Controller
         return $result->json();
     }
 
-    public function createAssistant($name, $instruction): array
+    public function findAssistant($id)
     {
-        $client = $this->makeClient();
-        $result = $client->post('/v1/assistants', [
-            'model' => $this->model,
-            'instructions' => $instruction,
-            "tools" => [
-                ["type" => "code_interpreter"]
-            ],
-            'name' => $name,
+        return Assistant::findOrFail($id);
+    }
+
+    public function getAssistants()
+    {
+        return Assistant::paginate();
+    }
+
+    public function apiCreateAssistant(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'instructions' => 'required',
         ]);
-        return $result->json();
+
+        $assistant = $this->createAssistant($request->name, $request->instruction);
+        return response()->json($assistant);
+    }
+
+    public function apiAddMessageToThread($id, Request $request): array
+    {
+        $request->validate(['message' => 'required']);
+        return $this->addMessageToThread($id, $request->message);
     }
 
     public function addMessageToThread($threadId, $message): array
