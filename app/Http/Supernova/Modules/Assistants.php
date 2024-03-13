@@ -58,11 +58,14 @@ class Assistants extends Module
     public function onSave($id, $values, $info = []): int
     {
         $parentResult = parent::onSave($id, $values, $info);
-
-        if (!$id) {
-            $name =  data_get($values, 'save.name');
-            $instructions =  data_get($values, 'save.instructions');
-            $result = (new OpenIaController)->createAssistant($name, $instructions);
+        $controller = new OpenIaController;
+        $name =  data_get($values, 'save.name');
+        $instructions =  data_get($values, 'save.instructions');
+        if ($id) {
+            $model = $this->makeModel()->findOrFail($id);
+            $controller->updateAssistant($model->openia_id, $name, $instructions);
+        } else {
+            $result = $controller->createAssistant($name, $instructions);
             $model = $this->makeModel()->findOrFail($parentResult);
             $model->openia_id = data_get($result, "id");
             $model->save();

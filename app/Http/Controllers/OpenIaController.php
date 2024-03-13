@@ -112,15 +112,14 @@ class OpenIaController extends Controller
         return Assistant::paginate();
     }
 
-    public function apiCreateAssistant(Request $request)
+    public function updateAssistant($id, $name, $instruction): array
     {
-        $request->validate([
-            'name' => 'required',
-            'instructions' => 'required',
+        $client = $this->makeClient();
+        $result = $client->post('/v1/assistants/' . $id, [
+            'name' => $name,
+            'instructions' => $instruction,
         ]);
-
-        $assistant = $this->createAssistant($request->name, $request->instruction);
-        return response()->json($assistant);
+        return $result->json();
     }
 
     public function deleteAssistant($id): array

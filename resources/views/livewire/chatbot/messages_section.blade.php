@@ -1,4 +1,11 @@
 <div class="flex flex-col flex-grow w-full overflow-hidden">
+    <style>
+        .text-sm p {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+    </style>
+
     <div class="flex flex-col flex-grow p-4 overflow-auto" id="message-section" assistant_id="{{ $assistantId }}"
         thread_id="{{ $threadId }}">
         @foreach ($messages as $message)
@@ -11,7 +18,7 @@
                 <div>
                     <div
                         class="p-3 rounded-r-lg rounded-bl-lg {{ $isUser ? 'text-white bg-blue-600 dark:bg-blue-800' : 'text-black bg-gray-300 dark:bg-gray-600 dark:text-white' }}">
-                        <p class="text-sm">{{ data_get($message, 'content') }}</p>
+                        <div class="text-sm"> {!! Markdown::parse(data_get($message, 'content')) !!}</div>
                     </div>
                 </div>
             </div>
