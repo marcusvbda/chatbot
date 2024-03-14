@@ -17,6 +17,7 @@ class SettingsSeeder extends Seeder
 
     protected function createSettings()
     {
+        Setting::truncate();
         Setting::create(["key" => "openia_base_url", "value" => "https://api.openai.com"]);
         Setting::create(["key" => "openia_api_key", "value" => env("OPENIA_API_KEY")]);
     }
