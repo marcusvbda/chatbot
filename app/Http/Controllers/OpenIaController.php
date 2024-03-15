@@ -75,8 +75,12 @@ class OpenIaController extends Controller
     public function removeAssistantFile(Assistant $assistant): void
     {
         $client = $this->makeClient();
-        $client->delete('/v1/assistants/' . $assistant->openia_id . '/files/' . $assistant->file_id);
-        $client->delete('/v1/files/' . $assistant->file_id);
+        try {
+            $client->delete('/v1/assistants/' . $assistant->openia_id . '/files/' . $assistant->file_id);
+            $client->delete('/v1/files/' . $assistant->file_id);
+        } catch (\Exception $e) {
+            // do nothing
+        }
         $assistant->file_id = null;
         $assistant->save();
     }
@@ -112,21 +116,27 @@ class OpenIaController extends Controller
         return Assistant::paginate();
     }
 
-    public function updateAssistant($id, $name, $instruction): array
+    public function updateAssistant($id, $name, $instruction): void
     {
-        $client = $this->makeClient();
-        $result = $client->post('/v1/assistants/' . $id, [
-            'name' => $name,
-            'instructions' => $instruction,
-        ]);
-        return $result->json();
+        try {
+            $client = $this->makeClient();
+            $client->post('/v1/assistants/' . $id, [
+                'name' => $name,
+                'instructions' => $instruction,
+            ]);
+        } catch (\Exception $e) {
+            // do nothing
+        }
     }
 
-    public function deleteAssistant($id): array
+    public function deleteAssistant($id): void
     {
-        $client = $this->makeClient();
-        $result = $client->delete('/v1/assistants/' . $id);
-        return $result->json();
+        try {
+            $client = $this->makeClient();
+            $client->delete('/v1/assistants/' . $id);
+        } catch (\Exception $e) {
+            // do nothing
+        }
     }
 
     public function createAssistant($name, $instruction): array
