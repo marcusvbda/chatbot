@@ -10,9 +10,7 @@ class SettingsSeeder extends Seeder
 {
     public function run()
     {
-        DB::beginTransaction();
         $this->createSettings();
-        DB::commit();
     }
 
     protected function createSettings()

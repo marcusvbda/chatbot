@@ -4,15 +4,12 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class StartUpSeeder extends Seeder
 {
     public function run()
     {
-        DB::beginTransaction();
         $this->createUsers();
-        DB::commit();
     }
 
     protected function createUsers()

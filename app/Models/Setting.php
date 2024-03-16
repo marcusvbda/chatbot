@@ -12,6 +12,7 @@ class Setting extends Model
     public static $KEYS = [
         ["value" => "openia_api_key", "label" => "Chave de API OpenIA"],
         ["value" => "openia_base_url", "label" => "Url da API OpenIA"],
+        ["value" => "teste", "label" => "teste"],
     ];
 
     public function assistant()

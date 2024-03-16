@@ -62,7 +62,7 @@ class Settings extends Module
     public function fields($row, $page): array
     {
         return [
-            Field::make("key", "Chave")->rules(["required", "unique:assistant_settings,key," . @$row->id])
+            Field::make("key", "Chave")->rules(["required", "unique:settings,key," . @$row->id])
                 ->type(FIELD_TYPES::SELECT)->options(Setting::$KEYS),
             Field::make("value", "Valor")->rules(["required"]),
         ];
