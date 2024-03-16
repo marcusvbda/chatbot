@@ -1,62 +1,69 @@
-FROM ubuntu:22.04
+FROM php:8.1-fpm-alpine
 
-LABEL maintainer="Taylor Otwell"
+RUN mkdir -p /var/www/html
 
-ARG WWWGROUP
-ARG NODE_VERSION=20
-ARG POSTGRES_VERSION=15
+COPY ./config/docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
-WORKDIR /var/www/html
+ARG UID
+ARG GID
+ARG DB_PROD_HOST
+ARG DB_PROD_PORT
+ARG SSH_PROD_USER
+ARG SSH_PROD_SERVER
+ARG SSH_MYSQL_FORWARD_PORT
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV TZ=UTC
+ENV UID=${UID}
+ENV GID=${GID}
+ENV DB_PROD_HOST=${DB_PROD_HOST}
+ENV DB_PROD_PORT=${DB_PROD_PORT}
+ENV SSH_PROD_USER=${SSH_PROD_USER}
+ENV SSH_PROD_SERVER=${SSH_PROD_SERVER}
+ENV SSH_MYSQL_FORWARD_PORT=${SSH_MYSQL_FORWARD_PORT}
 
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apk --no-cache update \
+    && apk --no-cache upgrade \
+    && apk add --no-cache icu-dev pcre-dev $PHPIZE_DEPS \
+    freetype-dev \
+    jpeg-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libzip-dev
 
-RUN apt-get update \
-    && mkdir -p /etc/apt/keyrings \
-    && apt-get install -y gnupg gosu curl ca-certificates zip unzip git supervisor sqlite3 libcap2-bin libpng-dev python2 dnsutils librsvg2-bin fswatch \
-    && curl -sS 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c' | gpg --dearmor | tee /usr/share/keyrings/ppa_ondrej_php.gpg > /dev/null \
-    && echo "deb [signed-by=/usr/share/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu jammy main" > /etc/apt/sources.list.d/ppa_ondrej_php.list \
-    && apt-get update \
-    && apt-get install -y php8.1-cli php8.1-dev \
-    php8.1-pgsql php8.1-sqlite3 php8.1-gd php8.1-imagick \
-    php8.1-curl \
-    php8.1-imap php8.1-mysql php8.1-mbstring \
-    php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap \
-    php8.1-intl php8.1-readline \
-    php8.1-ldap \
-    php8.1-msgpack php8.1-igbinary php8.1-redis php8.1-swoole \
-    php8.1-memcached php8.1-pcov php8.1-xdebug \
-    && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
-    && apt-get update \
-    && apt-get install -y nodejs \
-    && npm install -g npm \
-    && npm install -g bun \
-    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /usr/share/keyrings/yarn.gpg >/dev/null \
-    && echo "deb [signed-by=/usr/share/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
-    && curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /usr/share/keyrings/pgdg.gpg >/dev/null \
-    && echo "deb [signed-by=/usr/share/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-    && apt-get update \
-    && apt-get install -y yarn \
-    && apt-get install -y mysql-client \
-    && apt-get install -y postgresql-client-$POSTGRES_VERSION \
-    && apt-get -y autoremove \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN docker-php-ext-configure gd \
+    --with-freetype=/usr/lib/ \
+    --with-jpeg=/usr/include/ \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install intl \
+    && docker-php-ext-enable intl \
+    && docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) gd zip pdo pdo_mysql exif\
+    && pecl install redis \
+    && docker-php-ext-enable redis.so
 
-RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.1
+RUN docker-php-ext-install pcntl
 
-RUN groupadd --force -g $(id -g) sail \
-    && useradd -ms /bin/bash --no-user-group -g $(id -g) -u 1000 sail
+RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
+RUN alias composer='php /usr/bin/composer' && \
+    apk add --update nodejs npm
 
-COPY .docker/php/start-container /usr/local/bin/start-container
-COPY .docker/php/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY .docker/php/php.ini /etc/php/8.1/cli/conf.d/99-sail.ini
-RUN chmod +x /usr/local/bin/start-container
+RUN addgroup -g ${GID} --system laravel
+RUN adduser -G laravel --system -D -s /bin/sh -u ${UID} laravel
 
-EXPOSE 8000
+RUN apk --no-cache add nano zsh git zsh-autosuggestions zsh-syntax-highlighting bind-tools curl openssh && \
+    rm -rf /var/cache/apk/*
 
-ENTRYPOINT ["start-container"]
+USER laravel
+
+RUN sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+RUN echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc && \
+    echo "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" >> ~/.zshrc && \
+    echo "alias configzsh='nano ~/.zshrc && source ~/.zshrc'" >> ~/.zshrc && \
+    echo "alias home='cd ~/'" >> ~/.zshrc && \
+    echo "alias workdir='cd /var/www/html'" >> ~/.zshrc && \
+    echo "alias artisan='php artisan'" >> ~/.zshrc && \
+    echo "alias tinker='php artisan tinker'" >> ~/.zshrc && \
+    echo "alias watch='npm run watch'" >> ~/.zshrc && \
+    echo "alias dumpa='composer dump-autoload -o'" >> ~/.zshrc && \
+    echo "alias mysql_tunnel='ssh -4 -N -L ${SSH_MYSQL_FORWARD_PORT}:${DB_PROD_HOST}:${DB_PROD_PORT} ${SSH_PROD_USER}@${SSH_PROD_SERVER}'" >> ~/.zshrc
+
+COPY ./config/docker/ssh/ /home/laravel/.ssh/
